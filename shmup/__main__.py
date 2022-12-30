@@ -1,9 +1,14 @@
 import sys
+from shmup.game import Game
 
-def main():
-    print("Print de main")
+def main(args = None):
+    if args is None:
+        #print(sys.argv[0])
+        args = sys.argv[1:] #habitual en cualquier paquete python
+    game = Game()
+    game.run()
+    print ("Hello desde main module 2")
 
 if __name__ == '__main__':
-    print ("print de if name = main")
     sys.exit(main())
 #me quedo en minuto 41:55 del video
