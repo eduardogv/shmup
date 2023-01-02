@@ -11,4 +11,4 @@ def main(args = None):
 
 if __name__ == '__main__':
     sys.exit(main())
-#me quedo en minuto 41:55 del video
+#me quedo en minuto 08:00 del video modulo 6

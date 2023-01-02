@@ -15,7 +15,6 @@ class Game:
     __message_position = (10, 10)
 
     def __init__(self):
-
         pygame.init()
         #definimos las variables de instancia con self. y PRIVADAS con __
         self.__screen = pygame.display.set_mode(Game.__screen_size, 0, 32)
@@ -29,27 +28,66 @@ class Game:
         font  = pygame.font.Font(os.path.join(*Game.__font_path), Game.__font_size)
 
         self.__my_text = font.render(Game.__message, True, Game.__font_foreground_color, Game.__background_color)
+        self.__hero_image_half_width = self.__hero_image.get_width() / 2
+        self.__hero_image_half_height = self.__hero_image.get_height() / 2
+        self.__running = False #Por buenas prácticas se inicializa en el contructor
+        self.__is_moving_left = False
+        self.__is_moving_right = False
+        self.__is_moving_up = False
+        self.__is_moving_down = False
+        # defino la posicion, es lo mismoq ue poner un simple (x,y)
+        self.__hero_position = pygame.math.Vector2(self.__screen.get_width()/2 - self.__hero_image_half_width, self.__screen.get_height()/2  - self.__hero_image_half_height)
+        self.__hero_speed = 0.1
 
     def run(self):
-        __hero_image_half_width = self.__hero_image.get_width() / 2
-        __hero_image_half_height = self.__hero_image.get_height() / 2
+        self.__running = True
+        while self.__running:
+            self.__process_events()
+            self.__update()
+            self.__render()
+        self.__quit()
 
-        running = True
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
+    def __process_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.__running = False
+            if event.type == pygame.KEYDOWN:
+                self.__handle_player_input(event.key, True)
+            if event.type == pygame.KEYUP:
+                self.__handle_player_input(event.key, False)
 
-            self.__screen.fill(Game.__background_color) #borra y actualiza la img de fondo
-            x,y = pygame.mouse.get_pos()
-            x -= __hero_image_half_width
-            y -= __hero_image_half_height
-            self.__screen.blit(self.__hero_image, (x,y))
-            self.__screen.blit(self.__my_text, Game.__message_position)
+    def __handle_player_input(self, key, is_pressed):
+        if key == pygame.K_LEFT:
+            self.__is_moving_left = is_pressed
+        if key == pygame.K_RIGHT:
+            self.__is_moving_right = is_pressed
+        if key == pygame.K_UP:
+            self.__is_moving_up = is_pressed
+        if key == pygame.K_DOWN:
+            self.__is_moving_down = is_pressed
 
-            pygame.display.update()
+    def __update(self):
+        movement = pygame.math.Vector2(0.0, 0.0)
+        if self.__is_moving_left:
+            movement.x -= self.__hero_speed
+        if self.__is_moving_right:
+            movement.x += self.__hero_speed
+        if self.__is_moving_down:
+            movement.y += self.__hero_speed
+        if self.__is_moving_up:
+            movement.y -= self.__hero_speed
+        self.__hero_position += movement
 
-        self.quit()
+        """x, y = pygame.mouse.get_pos()
+        x -= self.__hero_image_half_width
+        y -= self.__hero_image_half_height"""
 
-    def quit(self):
+    def __render(self):
+        # borra y actualiza la img de fondo
+        self.__screen.fill(Game.__background_color)
+        self.__screen.blit(self.__hero_image, self.__hero_position.xy)
+        self.__screen.blit(self.__my_text, Game.__message_position)
+        pygame.display.update()
+
+    def __quit(self):
         pygame.quit()
